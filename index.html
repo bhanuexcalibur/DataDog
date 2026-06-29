@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datadog x Bhanu Kumar &middot; Proof of Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:       #0a0c10;
+  --bg2:      #11141a;
+  --bg3:      #161a22;
+  --bg4:      #1c212b;
+  --bg5:      #232a36;
+  --bdr:      rgba(255,255,255,0.06);
+  --bdr-md:   rgba(255,255,255,0.11);
+  --bdr-lg:   rgba(255,255,255,0.2);
+  --t1:       #ecedf0;
+  --t2:       #8d94a3;
+  --t3:       #4a5160;
+  --hot:      #ff7a45;
+  --hot-dim:  rgba(255,122,69,0.1);
+  --hot-t:    #ffa176;
+  --cold:     #36d6c4;
+  --cold-dim: rgba(54,214,196,0.1);
+  --cold-t:   #7ee9dc;
+  --vio:      #9d8cf5;
+  --vio-dim:  rgba(157,140,245,0.1);
+  --vio-t:    #c2b6fa;
+  --radius:   10px;
+  --radius-lg:16px;
+}
+
+html{scroll-behavior:smooth;scroll-padding-top:62px;}
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:16px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *{animation-duration:0.01ms !important;transition-duration:0.01ms !important;}
+}
+
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,122,69,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(54,214,196,0.02) 1px,transparent 1px);
+  background-size:46px 46px;
+}
+
+#rbar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--hot),var(--cold));z-index:999;width:0;transition:width .1s linear;}
+
+a{color:inherit;}
+::selection{background:var(--hot-dim);color:var(--t1);}
+:focus-visible{outline:2px solid var(--cold);outline-offset:2px;border-radius:4px;}
+
+.mono{font-family:'Space Mono',monospace;}
+
+/* ===== NAV ===== */
+.nav{
+  position:sticky;top:0;z-index:300;
+  background:rgba(10,12,16,0.92);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--bdr);
+  padding:0 5vw;
+}
+.nav-i{
+  max-width:1220px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;gap:16px;
+}
+.nav-brand{
+  font-family:'Space Mono',monospace;font-size:12px;
+  color:var(--t1);letter-spacing:0.02em;white-space:nowrap;
+  display:flex;align-items:center;gap:7px;flex-shrink:0;
+}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--hot);animation:pulse 2.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.35;transform:scale(0.7);}}
+.nav-links{display:flex;gap:1px;flex-wrap:wrap;}
+.nl{
+  font-size:12.5px;font-weight:500;
+  padding:6px 12px;border-radius:7px;
+  color:var(--t2);background:transparent;
+  text-decoration:none;transition:all 0.14s;white-space:nowrap;
+}
+.nl:hover{color:var(--t1);background:var(--bg3);}
+.nav-cta{
+  font-size:12.5px;font-weight:600;
+  padding:7px 15px;border-radius:7px;
+  background:var(--t1);color:var(--bg);
+  text-decoration:none;white-space:nowrap;flex-shrink:0;
+  transition:opacity 0.15s;
+}
+.nav-cta:hover{opacity:0.85;}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;flex-shrink:0;}
+.hbg span{display:block;width:20px;height:1.5px;background:var(--t1);border-radius:2px;transition:transform .3s,opacity .3s;}
+.hbg.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.hbg.open span:nth-child(2){opacity:0;}
+.hbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+.mob-menu{display:none;position:fixed;inset:0;top:60px;background:var(--bg);z-index:290;flex-direction:column;padding:28px 5vw;border-top:1px solid var(--bdr);}
+.mob-menu.open{display:flex;}
+.mob-menu a{display:block;font-size:18px;font-family:'Spectral',serif;font-weight:400;color:var(--t1);text-decoration:none;padding:15px 0;border-bottom:1px solid var(--bdr);}
+.mob-menu a:last-child{border-bottom:none;color:var(--hot-t);}
+@media(max-width:860px){.nav-links{display:none;}.nav-cta{display:none;}.hbg{display:flex;}}
+
+/* ===== LAYOUT ===== */
+.wrap{max-width:1220px;margin:0 auto;padding:0 5vw;position:relative;z-index:1;}
+section{padding:84px 0;border-bottom:1px solid var(--bdr);}
+.rv{opacity:0;transform:translateY(14px);transition:opacity 0.55s ease,transform 0.55s ease;}
+.rv.in{opacity:1;transform:none;}
+
+.sec-label{display:flex;align-items:baseline;gap:12px;margin-bottom:36px;}
+.sec-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--t3);letter-spacing:0.05em;}
+.sec-title{font-family:'Spectral',serif;font-size:clamp(24px,3vw,32px);font-weight:400;color:var(--t1);}
+.sec-intro{font-size:17px;color:var(--t2);max-width:760px;margin-bottom:44px;line-height:1.75;}
+.sec-intro strong{color:var(--t1);font-weight:500;}
+
+/* ===== HERO ===== */
+.hero{padding:100px 5vw 70px;max-width:1220px;margin:0 auto;border-bottom:1px solid var(--bdr);}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
+.hero-eyebrow{
+  font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:0.08em;
+  color:var(--hot-t);text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:22px;
+}
+.hero-eyebrow .ds{width:5px;height:5px;border-radius:50%;background:var(--hot);}
+.hero-h{
+  font-family:'Spectral',serif;font-weight:400;
+  font-size:clamp(32px,4.6vw,52px);
+  line-height:1.16;letter-spacing:-0.01em;color:var(--t1);margin-bottom:22px;
+}
+.hero-h em{font-style:italic;font-weight:300;color:var(--cold-t);}
+.hero-sub{font-size:16.5px;color:var(--t2);line-height:1.75;max-width:460px;margin-bottom:30px;}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-pri{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--t1);color:var(--bg);font-weight:600;font-size:14px;
+  padding:11px 18px;border-radius:8px;text-decoration:none;transition:opacity 0.15s;
+}
+.btn-pri:hover{opacity:0.85;}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:6px;
+  border:1px solid var(--bdr-md);color:var(--t1);font-weight:500;font-size:14px;
+  padding:11px 18px;border-radius:8px;text-decoration:none;transition:all 0.15s;background:transparent;
+}
+.btn-ghost:hover{border-color:var(--bdr-lg);background:var(--bg3);}
+
+/* ----- simulator ----- */
+.sim{
+  background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-lg);
+  padding:26px 26px 24px;
+}
+.sim-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px;flex-wrap:wrap;gap:6px;}
+.sim-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:0.06em;color:var(--t2);text-transform:uppercase;}
+.sim-sub{font-family:'Space Mono',monospace;font-size:11px;color:var(--t3);}
+.sim-delta{margin-bottom:18px;}
+.sim-delta-val{font-family:'Spectral',serif;font-size:clamp(30px,4vw,38px);color:var(--t1);font-weight:500;line-height:1;}
+.sim-delta-lbl{font-size:13px;color:var(--t2);margin-top:4px;}
+.sim-readout{display:flex;gap:18px;margin-bottom:18px;}
+.sim-stat{flex:1;border-radius:8px;padding:12px 14px;border:1px solid var(--bdr);}
+.sim-stat.hot{border-color:rgba(255,122,69,0.25);background:var(--hot-dim);}
+.sim-stat.cold{border-color:rgba(54,214,196,0.25);background:var(--cold-dim);}
+.sim-stat-label{display:block;font-size:11.5px;color:var(--t2);margin-bottom:4px;}
+.sim-stat-row{display:flex;align-items:baseline;gap:4px;}
+.sim-stat-val{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;}
+.sim-stat.hot .sim-stat-val{color:var(--hot-t);}
+.sim-stat.cold .sim-stat-val{color:var(--cold-t);}
+.sim-stat-unit{font-size:12px;color:var(--t3);}
+.sim-bars{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.sim-bar-track{height:8px;border-radius:5px;background:var(--bg4);overflow:hidden;}
+.sim-bar-fill{height:100%;border-radius:5px;width:0%;will-change:width;}
+.sim-bar-fill.hot{background:linear-gradient(90deg,var(--hot),var(--hot-t));}
+.sim-bar-fill.cold{background:linear-gradient(90deg,var(--cold),var(--cold-t));}
+.sim-slider{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:3px;background:var(--bg4);outline:none;margin-bottom:8px;}
+.sim-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--t1);cursor:pointer;border:3px solid var(--bg2);box-shadow:0 0 0 1px var(--bdr-md);}
+.sim-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--t1);cursor:pointer;border:3px solid var(--bg2);}
+.sim-slider-labels{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--t3);margin-bottom:16px;}
+.sim-slider-labels span:nth-child(2){color:var(--t2);}
+.sim-foot{font-size:12px;color:var(--t3);line-height:1.6;border-top:1px solid var(--bdr);padding-top:14px;}
+.sim-foot strong{color:var(--t2);}
+
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:36px;}
+  .hero{padding:56px 5vw 50px;}
+}
+
+/* ===== TABS (buyer audit) ===== */
+.tabs{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+.tab-btn{
+  font-family:'Space Mono',monospace;font-size:12px;
+  padding:10px 16px;border-radius:8px;border:1px solid var(--bdr-md);
+  background:var(--bg2);color:var(--t2);cursor:pointer;transition:all 0.15s;text-align:left;
+}
+.tab-btn .tb-role{display:block;font-size:10px;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:3px;}
+.tab-btn.on{border-color:var(--hot);color:var(--t1);background:var(--hot-dim);}
+.tab-btn.on .tb-role{color:var(--hot-t);}
+.tab-panel{display:none;}
+.tab-panel.on{display:block;}
+.tp-quote{
+  font-family:'Spectral',serif;font-style:italic;font-size:clamp(19px,2.2vw,24px);
+  color:var(--t1);line-height:1.5;margin-bottom:18px;max-width:780px;
+}
+.tp-body{color:var(--t2);font-size:15.5px;line-height:1.8;max-width:780px;}
+.tp-body strong{color:var(--t1);font-weight:500;}
+
+/* ===== BATTLECARD ===== */
+.battle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.battle-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-lg);padding:24px;display:flex;flex-direction:column;gap:14px;}
+.battle-vs{font-family:'Space Mono',monospace;font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em;}
+.battle-name{font-family:'Spectral',serif;font-size:21px;color:var(--t1);margin-bottom:2px;}
+.battle-row{border-top:1px solid var(--bdr);padding-top:12px;}
+.battle-row-lbl{font-size:10.5px;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.04em;color:var(--t3);margin-bottom:6px;display:block;}
+.battle-row-txt{font-size:14px;color:var(--t2);line-height:1.65;}
+.battle-row.win .battle-row-lbl{color:var(--cold-t);}
+.battle-row.gap{cursor:default;}
+.battle-row.gap summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;}
+.battle-row.gap summary::-webkit-details-marker{display:none;}
+.battle-row.gap summary::after{content:'+ show';font-family:'Space Mono',monospace;font-size:9.5px;color:var(--t3);text-transform:none;letter-spacing:0;margin-left:2px;}
+.battle-row.gap[open] summary::after{content:'− hide';}
+.battle-row.gap .battle-row-txt{margin-top:8px;}
+.battle-row.gap .battle-row-lbl{color:var(--hot-t);}
+@media(max-width:980px){.battle-grid{grid-template-columns:1fr;}}
+
+/* ===== GTM BRIEF ===== */
+.gtm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:46px;}
+.gtm-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-lg);padding:24px;}
+.gtm-card.thesis{grid-column:1/-1;border-color:rgba(255,122,69,0.2);background:linear-gradient(160deg,var(--hot-dim),transparent 60%);}
+.gtm-lbl{font-family:'Space Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);margin-bottom:10px;display:block;}
+.gtm-card h4{font-family:'Spectral',serif;font-weight:500;font-size:18px;color:var(--t1);margin-bottom:10px;line-height:1.4;}
+.gtm-card p{font-size:14.5px;color:var(--t2);line-height:1.7;}
+.gtm-card p+p{margin-top:10px;}
+@media(max-width:900px){.gtm-grid{grid-template-columns:1fr;}}
+
+.roadmap-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:18px;}
+.road-step{border:1px solid var(--bdr);border-radius:var(--radius-lg);margin-bottom:10px;overflow:hidden;background:var(--bg2);}
+.road-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;cursor:pointer;}
+.road-left{display:flex;align-items:center;gap:14px;}
+.road-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--t3);}
+.road-title{font-size:15px;font-weight:500;color:var(--t1);}
+.road-chev{transition:transform 0.2s;color:var(--t3);}
+.road-step.open .road-chev{transform:rotate(180deg);}
+.road-body{max-height:0;overflow:hidden;transition:max-height 0.3s ease;}
+.road-step.open .road-body{max-height:220px;}
+.road-body-i{padding:0 22px 20px;font-size:14.5px;color:var(--t2);line-height:1.75;}
+
+/* ===== PROOF PROGRAM ===== */
+.proof-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.proof-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-lg);padding:22px;}
+.proof-tag{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--vio-t);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;display:inline-block;background:var(--vio-dim);padding:3px 9px;border-radius:5px;}
+.proof-card h4{font-family:'Spectral',serif;font-weight:500;font-size:17px;color:var(--t1);margin:6px 0 14px;}
+.proof-line{display:flex;gap:10px;margin-bottom:10px;font-size:13.5px;}
+.proof-line-lbl{flex-shrink:0;width:64px;color:var(--t3);font-family:'Space Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.03em;padding-top:1px;}
+.proof-line-txt{color:var(--t2);line-height:1.6;}
+@media(max-width:900px){.proof-grid{grid-template-columns:1fr;}}
+
+/* ===== ENABLEMENT ===== */
+.enable-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-lg);padding:26px;margin-bottom:16px;}
+.enable-card.feat{border-color:rgba(255,122,69,0.22);}
+.enable-card.restraint{border-color:rgba(54,214,196,0.22);background:linear-gradient(160deg,var(--cold-dim),transparent 65%);}
+.restraint-head{color:var(--cold-t);}
+.restraint-intro{font-size:14px;color:var(--t2);line-height:1.7;margin-bottom:14px;padding-top:14px;border-top:1px solid var(--bdr);}
+.restraint-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.restraint-list li{font-size:14.5px;color:var(--t2);line-height:1.7;padding-left:18px;position:relative;}
+.restraint-list li::before{content:'';position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--cold);}
+.enable-obj{font-family:'Spectral',serif;font-style:italic;font-size:18px;color:var(--t1);margin-bottom:16px;line-height:1.5;}
+.enable-row{display:grid;grid-template-columns:110px 1fr;gap:14px;padding:10px 0;border-top:1px solid var(--bdr);}
+.enable-row:first-of-type{border-top:none;}
+.enable-lbl{font-family:'Space Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.04em;color:var(--t3);padding-top:2px;}
+.enable-txt{font-size:14.5px;color:var(--t2);line-height:1.7;}
+.enable-row.landmine .enable-lbl{color:var(--hot-t);}
+.enable-compact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+@media(max-width:900px){.enable-row{grid-template-columns:1fr;}.enable-compact-grid{grid-template-columns:1fr;}}
+
+/* ===== OTHER WORK ===== */
+.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.wcard{
+  display:block;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-lg);
+  padding:22px;text-decoration:none;transition:all 0.18s;position:relative;
+}
+.wcard:hover{border-color:var(--bdr-lg);transform:translateY(-2px);background:var(--bg3);}
+.wcard-tag{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:0.03em;margin-bottom:10px;}
+.wcard h4{font-family:'Spectral',serif;font-weight:500;font-size:17px;color:var(--t1);margin-bottom:8px;line-height:1.4;}
+.wcard p{font-size:13.5px;color:var(--t2);line-height:1.65;}
+.wcard .warr{position:absolute;top:22px;right:20px;color:var(--t3);transition:transform 0.15s;}
+.wcard:hover .warr{transform:translate(2px,-2px);color:var(--t1);}
+@media(max-width:980px){.wgrid{grid-template-columns:1fr 1fr;}}
+@media(max-width:680px){.wgrid{grid-template-columns:1fr;}}
+
+/* ===== SIGNATURE / FOOTER ===== */
+.sig-wrap{padding-top:60px;padding-bottom:70px;}
+.sig{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+.sig-name{font-family:'Spectral',serif;font-size:26px;color:var(--t1);margin-bottom:8px;}
+.sig-name span{color:var(--t2);}
+.sig-links{display:flex;gap:16px;font-size:13.5px;}
+.sig-links a{color:var(--t2);text-decoration:none;border-bottom:1px solid var(--bdr-md);padding-bottom:1px;transition:color 0.15s;}
+.sig-links a:hover{color:var(--t1);border-color:var(--t1);}
+.sig-btns{display:flex;gap:10px;}
+.sig-foot-note{margin-top:26px;font-size:12.5px;color:var(--t3);max-width:560px;line-height:1.7;}
+
+@media(max-width:600px){
+  section{padding:60px 0;}
+  .sec-title{font-size:24px;}
+}
+</style>
+</head>
+<body>
+
+<div id="rbar"></div>
+
+<nav class="nav">
+  <div class="nav-i">
+    <div class="nav-brand"><span class="nav-dot"></span>Bhanu Kumar &nbsp;&middot;&nbsp; Datadog</div>
+    <div class="nav-links">
+      <a class="nl" href="#audit">Audit</a>
+      <a class="nl" href="#battlecard">Battlecard</a>
+      <a class="nl" href="#gtm">GTM Brief</a>
+      <a class="nl" href="#proof">Proof Program</a>
+      <a class="nl" href="#enablement">Enablement</a>
+      <a class="nl" href="#work">Work</a>
+    </div>
+    <a class="nav-cta" href="https://drive.google.com/file/d/1TBEPQOjseq1cCCscEcG046mV7OBDYjvT/view" target="_blank" rel="noopener">Resume &rarr;</a>
+    <button class="hbg" id="hbg" onclick="toggleMob()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mob-menu" id="mobm">
+  <a href="#audit" onclick="closeMob()">Audit</a>
+  <a href="#battlecard" onclick="closeMob()">Battlecard</a>
+  <a href="#gtm" onclick="closeMob()">GTM Brief</a>
+  <a href="#proof" onclick="closeMob()">Proof Program</a>
+  <a href="#enablement" onclick="closeMob()">Enablement</a>
+  <a href="#work" onclick="closeMob()">Work</a>
+  <a href="https://drive.google.com/file/d/1TBEPQOjseq1cCCscEcG046mV7OBDYjvT/view" target="_blank" rel="noopener" onclick="closeMob()">Resume &rarr;</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-eyebrow"><span class="ds"></span>Product Marketing &middot; Log Management</div>
+      <h1 class="hero-h">Every log is worth keeping.<br><em>Not every log is worth indexing.</em></h1>
+      <p class="hero-sub">Flex Logs already answers the cost half of that sentence. This is the work to carry that idea forward, through everything Datadog has shipped since.</p>
+      <div class="hero-ctas">
+        <a class="btn-pri" href="#audit">See the audit &darr;</a>
+        <a class="btn-ghost" href="#gtm">Read the GTM brief</a>
+      </div>
+    </div>
+    <div>
+      <div class="sim" id="sim">
+        <div class="sim-head">
+          <span class="sim-label">Flex Logs cost model</span>
+          <span class="sim-sub mono">$ live, public pricing</span>
+        </div>
+        <div class="sim-delta">
+          <div class="sim-delta-val mono" id="deltaVal">$66</div>
+          <div class="sim-delta-lbl">saved per month, storage only, at this volume</div>
+        </div>
+        <div class="sim-readout">
+          <div class="sim-stat hot">
+            <span class="sim-stat-label">Standard Indexing</span>
+            <div class="sim-stat-row"><span class="sim-stat-val" id="statHot">$68</span><span class="sim-stat-unit">/mo</span></div>
+          </div>
+          <div class="sim-stat cold">
+            <span class="sim-stat-label">Flex Logs storage</span>
+            <div class="sim-stat-row"><span class="sim-stat-val" id="statCold">$2</span><span class="sim-stat-unit">/mo</span></div>
+          </div>
+        </div>
+        <div class="sim-bars">
+          <div class="sim-bar-track"><div class="sim-bar-fill hot" id="barHot" style="width:0%"></div></div>
+          <div class="sim-bar-track"><div class="sim-bar-fill cold" id="barCold" style="width:0%"></div></div>
+        </div>
+        <input type="range" class="sim-slider" id="volSlider" min="10" max="5000" value="40" step="5" aria-label="Monthly log volume in millions of events">
+        <div class="sim-slider-labels">
+          <span>10M&nbsp;events/mo</span>
+          <span id="volLabel">40M events/mo</span>
+          <span>5B&nbsp;events/mo</span>
+        </div>
+        <div class="sim-foot">Modeled on Datadog's public rates: $1.70/million events indexed (15-day retention, annual) vs $0.05/million events stored in Flex. <strong>The ratio holds at 34x across any volume.</strong> What grows is how many dollars that ratio represents, and Flex still trades monitor/alerting support for the lower price, that trade is exactly what Part 01 below is about.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 01 MESSAGING AUDIT ===== -->
+<section id="audit">
+  <div class="wrap">
+    <div class="sec-label rv"><span class="sec-num mono">01</span><span class="sec-title">Messaging Audit</span></div>
+    <p class="sec-intro rv">Flex Logs has the right mechanics. The framing still talks mostly to the person configuring it and skips the people who actually approve the spend or carry the audit risk. <strong>Three buyers, three different gaps.</strong></p>
+
+    <div class="tabs rv">
+      <button class="tab-btn on" onclick="swTab('sre',this)"><span class="tb-role">Champion</span>SRE / Platform Engineer</button>
+      <button class="tab-btn" onclick="swTab('vp',this)"><span class="tb-role">Economic buyer</span>VP Engineering</button>
+      <button class="tab-btn" onclick="swTab('sec',this)"><span class="tb-role">Influencer</span>Security &amp; Compliance</button>
+    </div>
+
+    <div class="rv">
+      <div class="tab-panel on" id="tp-sre">
+        <div class="tp-quote">"I get what Flex Logs does. I don't know which of my forty log sources actually belong in it."</div>
+        <div class="tp-body">Datadog's documentation explains what Flex Logs is, not which logs belong there. That decision, query frequency against business criticality, source by source, is left to the customer, so platform teams either over-index out of caution or under-migrate out of inertia. Neither saves money. <strong>What this persona needs isn't more pricing explanation, it's a tiering worksheet:</strong> a two-axis test (how often is this queried, does it need real-time alerting) that maps a source to Standard, Flex, or Archive without a meeting. Ship it inside the product, not a PDF, and "where logs go" stops being the blocker.</div>
+      </div>
+      <div class="tab-panel" id="tp-vp">
+        <div class="tp-quote">"I don't think in millions of events. I think in what this line item looks like next quarter."</div>
+        <div class="tp-body">$0.05 per million events is a unit built for the person configuring the tier, not the person approving the budget. By the time log volume shows up on a VP's radar, it's usually because the logs line grew faster than headcount or revenue did, and FinOps practice has caught up to that: most teams managing SaaS spend now treat platform bills like this one as an active line item, not something engineering quietly absorbs. <strong>The rewrite for this buyer isn't a cheaper number, it's a different sentence:</strong> Flex Logs is the lever that lets log volume grow without the bill growing at the same rate. That's a forecasting claim, not a pricing detail, and it's the one this buyer actually needs to repeat upward to their own leadership.</div>
+      </div>
+      <div class="tab-panel" id="tp-sec">
+        <div class="tp-quote">"Cost isn't my problem. Producing this log in the next ten minutes is."</div>
+        <div class="tp-body">Flex Frozen and Archive Search were built for exactly this person, long retention with full searchability and no rehydration step, but they still get introduced as cost or storage features. For a compliance or security buyer, cheaper storage is a nice side effect of the real value: <strong>when an examiner, auditor, or incident responder asks for a log from fourteen months ago, it's already searchable</strong>, not buried in an archive that needs re-indexing under deadline. That's an audit-readiness story, and it deserves to be told as one, separately from the cost narrative aimed at engineering leadership in the tab above.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 02 COMPETITIVE BATTLECARD ===== -->
+<section id="battlecard">
+  <div class="wrap">
+    <div class="sec-label rv"><span class="sec-num mono">02</span><span class="sec-title">Competitive Intelligence</span></div>
+    <p class="sec-intro rv">Three different conversations get lumped into one "why not just use something cheaper" objection on a call. <strong>They need three different answers, not one deflection.</strong></p>
+
+    <div class="battle-grid rv">
+      <div class="battle-card">
+        <div><span class="battle-vs">Objection source</span><div class="battle-name">Grafana Loki</div></div>
+        <div class="battle-row"><span class="battle-row-lbl">Heard on the call</span><p class="battle-row-txt">"We could run Loki ourselves and pay a fraction of what Datadog charges per GB."</p></div>
+        <div class="battle-row"><span class="battle-row-lbl">Why customers believe this</span><p class="battle-row-txt">Loki's label-only indexing is genuinely cheaper, and Grafana Cloud's published per-GB pricing undercuts Datadog's ingestion rate on paper.</p></div>
+        <div class="battle-row win"><span class="battle-row-lbl">The answer</span><p class="battle-row-txt">Flex Logs makes the same trade: index a subset, store the rest cheaply, inside the platform that already correlates the log with the trace and the host metric. Nothing new to operate.</p></div>
+        <details class="battle-row gap"><summary class="battle-row-lbl">Where the gap is real</summary><p class="battle-row-txt">If a team already built capacity around Loki, Mimir, and Tempo, the conversation isn't price anymore, it's sunk cost and switching risk. No pricing page wins that one.</p></details>
+      </div>
+
+      <div class="battle-card">
+        <div><span class="battle-vs">Objection source</span><div class="battle-name">Splunk</div></div>
+        <div class="battle-row"><span class="battle-row-lbl">Heard on the call</span><p class="battle-row-txt">"Splunk's SPL does more for our security investigations than Datadog's log search."</p></div>
+        <div class="battle-row"><span class="battle-row-lbl">Why customers believe this</span><p class="battle-row-txt">Splunk's query depth and SIEM maturity are real strengths, and it's still the default name in security, even as cost is what pushes teams to look elsewhere.</p></div>
+        <div class="battle-row win"><span class="battle-row-lbl">The answer</span><p class="battle-row-txt">Flex Frozen and Archive Search target teams outgrowing Splunk's retention costs: long-term searchable storage without the rehydration tax that makes Splunk's cold tier painful to use.</p></div>
+        <details class="battle-row gap"><summary class="battle-row-lbl">Where the gap is real</summary><p class="battle-row-txt">Full SPL-level parity for the deepest security workflows isn't there yet. That's a roadmap conversation, not one messaging should paper over.</p></details>
+      </div>
+
+      <div class="battle-card">
+        <div><span class="battle-vs">Objection source</span><div class="battle-name">Pipeline tools</div></div>
+        <div class="battle-row"><span class="battle-row-lbl">Heard on the call</span><p class="battle-row-txt">"We don't need to switch platforms, we just filter logs before they hit Datadog and the bill drops."</p></div>
+        <div class="battle-row"><span class="battle-row-lbl">Why customers believe this</span><p class="battle-row-txt">This is a legitimate, fast-growing motion (Cribl, Edge Delta, and similar), and the publicly quoted savings, often 50 to 80 percent, are too large to wave off.</p></div>
+        <div class="battle-row win"><span class="battle-row-lbl">The answer</span><p class="battle-row-txt">Pipeline filtering and Flex Logs aren't competing claims. One decides what to send, the other decides where to put it. The strongest version treats pipeline vendors as an on-ramp into Flex, not a threat.</p></div>
+        <details class="battle-row gap"><summary class="battle-row-lbl">Where the gap is real</summary><p class="battle-row-txt">If Flex Logs keeps getting messaged as purely defensive, the "we help you control this" narrative gets ceded to the pipeline vendors. That's a messaging fix, not a product one.</p></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 03 GTM BRIEF ===== -->
+<section id="gtm">
+  <div class="wrap">
+    <div class="sec-label rv"><span class="sec-num mono">03</span><span class="sec-title">GTM Brief</span></div>
+
+    <div class="gtm-grid rv">
+      <div class="gtm-card thesis">
+        <span class="gtm-lbl">Core thesis</span>
+        <h4>Flex Logs solved the cost objection in 2023. Federated Logs and BYOC Logs, both announced at DASH 2026, solve the next one: where the data already lives.</h4>
+        <p>Right now those read as three separate launches. The GTM job is making them read as one continuing argument about log economics, not three announcements that fade into their own roundup post. The window to do it is short: Federated Logs and BYOC Logs shipped two and a half weeks ago, while customers and press are still paying attention.</p>
+      </div>
+
+      <div class="gtm-card">
+        <span class="gtm-lbl">ICP priority</span>
+        <h4>Two buyers worth prioritizing: AI-scale engineering orgs, and regulated orgs needing data residency</h4>
+        <p>Agent framework adoption nearly doubled year over year heading into 2026, and services running on those frameworks more than doubled in the same window. That's already showing up in telemetry Datadog itself collects, an unusually well-timed moment to connect Flex Logs to a growth driver the company already measures.</p>
+        <p>BYOC Logs runs Datadog's log engine inside the customer's own infrastructure, answering a buyer once told that keeping logs in-region meant leaving the platform. Pair it with the Part 01 compliance story, not a feature roundup line item.</p>
+      </div>
+
+      <div class="gtm-card">
+        <span class="gtm-lbl">Channel priority</span>
+        <h4>Content plus a public version of the cost framework</h4>
+        <p>Own the "Splunk alternative," "Loki vs Datadog," and "Datadog logs cost" search intent, and give the visitor a working volume calculator, the same model running in this page's hero, instead of a static pricing table. The value should be felt before a sales conversation starts.</p>
+      </div>
+    </div>
+
+    <div class="roadmap-label mono">90-day launch sequence</div>
+    <div class="rv">
+      <div class="road-step open" onclick="toggleStep(this)">
+        <div class="road-head">
+          <div class="road-left"><span class="road-num mono">01</span><span class="road-title">Ship the tiering decision framework &middot; Days 1&ndash;30</span></div>
+          <svg class="road-chev" width="14" height="9" viewBox="0 0 14 9" fill="none"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.6"/></svg>
+        </div>
+        <div class="road-body"><div class="road-body-i">Turn the SRE rewrite from Part 01 into an actual worksheet Sales and CS can hand over in every Logs deal, and publish the public-facing cost calculator referenced under Channel Priority. This is the asset that turns "Flex Logs exists" into "here's where it goes in your stack."</div></div>
+      </div>
+      <div class="road-step" onclick="toggleStep(this)">
+        <div class="road-head">
+          <div class="road-left"><span class="road-num mono">02</span><span class="road-title">Connect the launch sequence &middot; Days 31&ndash;60</span></div>
+          <svg class="road-chev" width="14" height="9" viewBox="0 0 14 9" fill="none"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.6"/></svg>
+        </div>
+        <div class="road-body"><div class="road-body-i">Build the content arc linking Flex Logs (cost) to Federated Logs (location) to BYOC Logs (control) as one progression, timed to ride DASH 2026 momentum while the announcements are still fresh rather than buried in a feature roundup.</div></div>
+      </div>
+      <div class="road-step" onclick="toggleStep(this)">
+        <div class="road-head">
+          <div class="road-left"><span class="road-num mono">03</span><span class="road-title">Operationalize battlecard and first proof points &middot; Days 61&ndash;90</span></div>
+          <svg class="road-chev" width="14" height="9" viewBox="0 0 14 9" fill="none"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.6"/></svg>
+        </div>
+        <div class="road-body"><div class="road-body-i">Get the Part 02 battlecard into Sales' hands with a feedback loop, and land the first two or three customer stories from the Part 04 proof program, each anchored to a specific Flex Logs use case rather than a generic logo mention.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 04 PROOF PROGRAM ===== -->
+<section id="proof">
+  <div class="wrap">
+    <div class="sec-label rv"><span class="sec-num mono">04</span><span class="sec-title">Customer Marketing Program</span></div>
+    <p class="sec-intro rv">Case studies usually start with someone on the team remembering a happy customer. That's a one-off. <strong>A program means the ask gets triggered by a usage signal, not a memory.</strong></p>
+
+    <div class="proof-grid rv">
+      <div class="proof-card">
+        <span class="proof-tag">Use case 01</span>
+        <h4>Security &amp; forensics logs</h4>
+        <div class="proof-line"><span class="proof-line-lbl">Trigger</span><span class="proof-line-txt">Customer enables Flex Frozen or runs an Archive Search query on data older than 90 days.</span></div>
+        <div class="proof-line"><span class="proof-line-lbl">Proof</span><span class="proof-line-txt">A specific investigation-time quote, not a generic testimonial, packaged as a one-page card reusable in the Part 02 battlecard.</span></div>
+      </div>
+      <div class="proof-card">
+        <span class="proof-tag">Use case 02</span>
+        <h4>High-volume network &amp; CDN logs</h4>
+        <div class="proof-line"><span class="proof-line-lbl">Trigger</span><span class="proof-line-txt">A Flex Logs compute tier upgrade, Starter to a scalable size, a real adoption signal, not a survey response.</span></div>
+        <div class="proof-line"><span class="proof-line-lbl">Proof</span><span class="proof-line-txt">A metric-led quote on volume retained that wasn't affordable to index in full, as a numbers-first social post and deck slide.</span></div>
+      </div>
+      <div class="proof-card">
+        <span class="proof-tag">Use case 03</span>
+        <h4>Compliance &amp; audit trail logs</h4>
+        <div class="proof-line"><span class="proof-line-lbl">Trigger</span><span class="proof-line-txt">A renewal call where the customer mentions an audit request that Archive Search resolved without a rehydration delay.</span></div>
+        <div class="proof-line"><span class="proof-line-lbl">Proof</span><span class="proof-line-txt">A joint webinar with the customer's compliance lead, who carries more weight with peers than a written case study, clipped for Part 01's audit-readiness story.</span></div>
+      </div>
+      <div class="proof-card">
+        <span class="proof-tag">Use case 04 &middot; emerging</span>
+        <h4>AI agent &amp; LLM telemetry</h4>
+        <div class="proof-line"><span class="proof-line-lbl">Trigger</span><span class="proof-line-txt">A customer running active LLM Observability with a Flex Logs source tagged to an agent framework.</span></div>
+        <div class="proof-line"><span class="proof-line-lbl">Proof</span><span class="proof-line-txt">Too early for a case study. Start with a co-written field note with one or two design partners, public once the pattern repeats.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 05 SALES ENABLEMENT ===== -->
+<section id="enablement" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="sec-label rv"><span class="sec-num mono">05</span><span class="sec-title">Sales Enablement</span></div>
+    <p class="sec-intro rv">One battlecard moment, written the way it would actually get used on a call, plus two compact ones for quick reference.</p>
+
+    <div class="rv">
+      <div class="enable-card feat">
+        <div class="enable-obj">"Our logs bill is already too high. Why would we add more volume to anything, even Flex?"</div>
+        <div class="enable-row"><span class="enable-lbl">Talk track</span><span class="enable-txt">Flex isn't more volume on the expensive meter, it's the same data moved to the cheap one. Walk me through your indexed sources for a minute, I'd bet a third haven't been queried in 30 days. Those are Flex candidates today, not someday.</span></div>
+        <div class="enable-row"><span class="enable-lbl">Bring to the call</span><span class="enable-txt">The Part 01 tiering worksheet, used live on the call, not emailed afterward.</span></div>
+        <div class="enable-row landmine"><span class="enable-lbl">Landmine</span><span class="enable-txt">Don't lead with the $0.05 number. It invites the prospect to do napkin math against their full indexed volume, which isn't the real comparison. Lead with "what's not being queried" instead.</span></div>
+      </div>
+
+      <div class="enable-compact-grid">
+        <div class="enable-card">
+          <div class="enable-obj">"We'll just filter with Cribl before it hits Datadog."</div>
+          <div class="enable-row"><span class="enable-lbl">One-liner</span><span class="enable-txt">Good instinct, different layer. Pipeline tools decide what gets sent. Flex decides where the sent data lives. Most teams running both save more than either alone.</span></div>
+        </div>
+        <div class="enable-card">
+          <div class="enable-obj">"We're worried about losing visibility if logs move to Flex."</div>
+          <div class="enable-row"><span class="enable-lbl">One-liner</span><span class="enable-txt">Fair concern: Flex doesn't support real-time monitors today. That's exactly why it's for sources you're not alerting on, anything that needs alerting stays in Standard. Per-source, not all-or-nothing.</span></div>
+        </div>
+      </div>
+
+      <div class="enable-card restraint">
+        <div class="enable-obj restraint-head">When not to push it</div>
+        <p class="restraint-intro">Every card above defends Flex. A rep who knows when to hold back earns more trust on the next call than one who doesn't.</p>
+        <ul class="restraint-list">
+          <li>The source needs real-time monitors or alerting. Flex doesn't support that today, pushing it here breaks something the customer relies on.</li>
+          <li>Volume is small enough that Standard Indexing already sits inside budget. Flex adds tiering overhead for savings that won't show up on the bill.</li>
+          <li>It's live incident response on the last few hours of data. Flex's compute model is built for occasional, ad-hoc queries, not active firefighting.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 06 OTHER RELEVANT WORK ===== -->
+<section id="work" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="sec-label rv"><span class="sec-num mono">06</span><span class="sec-title">Other Relevant Work</span></div>
+    <div class="wgrid rv">
+      <a href="https://bhanuexcalibur.github.io/Canonical/" class="wcard" target="_blank" rel="noopener">
+        <div class="wcard-tag">Messaging audit &middot; IoT infra</div>
+        <h4>Canonical &middot; Ubuntu Core</h4>
+        <p>Messaging audit and buyer mapping for an embedded Linux platform. Same underlying problem as Flex Logs: a technically sound product whose story still talks to the engineer who already chose it, not the buyer deciding whether to.</p>
+        <span class="warr">&rarr;</span>
+      </a>
+      <a href="https://bhanuexcalibur.github.io/Stripe/" class="wcard" target="_blank" rel="noopener">
+        <div class="wcard-tag">Pricing narrative &middot; Dev infra</div>
+        <h4>Stripe &middot; Proof of Work</h4>
+        <p>A pricing narrative audit and segment copy for a usage-based developer platform. Relevant here for the same reason: the buyer reading the pricing page and the buyer approving the bill are rarely the same person.</p>
+        <span class="warr">&rarr;</span>
+      </a>
+      <a href="https://bhanuexcalibur.github.io/ChargeBee/" class="wcard" target="_blank" rel="noopener">
+        <div class="wcard-tag">Billing complexity &middot; B2B SaaS</div>
+        <h4>ChargeBee</h4>
+        <p>Messaging work for a recurring revenue and usage-based billing platform, the closest parallel to Datadog's own multi-meter pricing: several dimensions that compound in ways customers don't see until the invoice lands.</p>
+        <span class="warr">&rarr;</span>
+      </a>
+      <a href="https://bhanuexcalibur.github.io/Deltek/" class="wcard" target="_blank" rel="noopener">
+        <div class="wcard-tag">Adoption gap &middot; Vertical SaaS</div>
+        <h4>Deltek Costpoint</h4>
+        <p>An adoption-gap audit for AI features inside an enterprise GovCon platform, where the product had shipped faster than compliance-first buyers were ready to trust it. The closest parallel to Flex Logs' own adoption problem.</p>
+        <span class="warr">&rarr;</span>
+      </a>
+      <a href="https://bhanuexcalibur.github.io/Continuous/" class="wcard" target="_blank" rel="noopener">
+        <div class="wcard-tag">Buyer mapping &middot; InfoSec</div>
+        <h4>Continuous</h4>
+        <p>A three-buyer messaging rewrite (CISO, IT Director, Compliance Officer) for a bank-facing access management product. Direct structural parallel to Part 01 of this page: one product, three buyers, three different reasons to say yes.</p>
+        <span class="warr">&rarr;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SIGNATURE ===== -->
+<div class="wrap sig-wrap">
+  <div class="sig rv">
+    <div>
+      <div class="sig-name">Bhanu <span>Kumar</span></div>
+      <div class="sig-links">
+        <a href="https://linkedin.com/in/bhanuexcalibur" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://drive.google.com/file/d/1TBEPQOjseq1cCCscEcG046mV7OBDYjvT/view" target="_blank" rel="noopener">Resume</a>
+        <a href="mailto:bhanukumar0902@gmail.com">Email</a>
+      </div>
+      <p class="sig-foot-note">Pricing figures referenced in this page (log ingestion, indexing, and Flex Logs storage rates) are drawn from Datadog's public pricing page. Flex Logs compute tier costs and the AI engineering adoption figures are noted as published statistics rather than estimates of any single customer's bill.</p>
+    </div>
+    <div class="sig-btns">
+      <a class="btn-pri" href="mailto:bhanukumar0902@gmail.com">Get in touch</a>
+      <a class="btn-ghost" href="https://drive.google.com/file/d/1TBEPQOjseq1cCCscEcG046mV7OBDYjvT/view" target="_blank" rel="noopener">Full resume &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* NAV TOGGLE */
+function toggleMob(){document.getElementById('hbg').classList.toggle('open');document.getElementById('mobm').classList.toggle('open');}
+function closeMob(){document.getElementById('hbg').classList.remove('open');document.getElementById('mobm').classList.remove('open');}
+
+/* BUYER TABS */
+function swTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('tp-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+
+/* ROADMAP ACCORDION */
+function toggleStep(step){
+  var isOpen=step.classList.contains('open');
+  document.querySelectorAll('.road-step').forEach(function(s){s.classList.remove('open');});
+  if(!isOpen){step.classList.add('open');}
+}
+
+/* READING PROGRESS BAR */
+window.addEventListener('scroll',function(){
+  var el=document.documentElement;
+  var pct=(el.scrollTop/(el.scrollHeight-el.clientHeight))*100;
+  document.getElementById('rbar').style.width=pct+'%';
+},{passive:true});
+
+/* SCROLL REVEAL */
+if('IntersectionObserver' in window){
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
+  },{threshold:0.04,rootMargin:'0px 0px -6px 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){obs.observe(el);});
+}else{
+  document.querySelectorAll('.rv').forEach(function(el){el.classList.add('in');});
+}
+window.addEventListener('load',function(){
+  document.querySelectorAll('.rv').forEach(function(el){
+    var r=el.getBoundingClientRect();
+    if(r.top<window.innerHeight-20){el.classList.add('in');}
+  });
+});
+
+/* ===== FLEX LOGS COST SIMULATOR ===== */
+(function(){
+  var slider=document.getElementById('volSlider');
+  var barHot=document.getElementById('barHot');
+  var barCold=document.getElementById('barCold');
+  var statHot=document.getElementById('statHot');
+  var statCold=document.getElementById('statCold');
+  var deltaVal=document.getElementById('deltaVal');
+  var volLabel=document.getElementById('volLabel');
+  var HOT_RATE=1.70, COLD_RATE=0.05;
+  var MAX_VOL=5000;
+  var MAX_HOT=MAX_VOL*HOT_RATE;
+  var rafPending=false;
+
+  function fmtVol(v){
+    if(v>=1000){
+      var b=v/1000;
+      return (b%1===0?b.toFixed(0):b.toFixed(1))+'B';
+    }
+    return Math.round(v)+'M';
+  }
+  function fmtMoney(n){
+    return '$'+n.toLocaleString('en-US',{maximumFractionDigits:n<100?2:0});
+  }
+
+  function render(vol){
+    var hot=vol*HOT_RATE;
+    var cold=vol*COLD_RATE;
+    var delta=hot-cold;
+    if(!rafPending){
+      rafPending=true;
+      requestAnimationFrame(function(){
+        barHot.style.width=Math.min(100,(hot/MAX_HOT)*100)+'%';
+        barCold.style.width=Math.min(100,(cold/MAX_HOT)*100)+'%';
+        statHot.textContent=fmtMoney(hot);
+        statCold.textContent=fmtMoney(cold);
+        deltaVal.textContent=fmtMoney(delta);
+        volLabel.textContent=fmtVol(vol)+' events/mo';
+        rafPending=false;
+      });
+    }
+  }
+
+  slider.addEventListener('input',function(){render(parseFloat(slider.value));},{passive:true});
+  render(parseFloat(slider.value));
+
+  function autoDemo(){
+    var prefersReduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(prefersReduced){slider.value=600;render(600);return;}
+    var start=40,end=2200,dur=1200,t0=null;
+    function step(now){
+      if(!t0){t0=now;}
+      var p=Math.min(1,(now-t0)/dur);
+      var eased=1-Math.pow(1-p,3);
+      var val=start+(end-start)*eased;
+      slider.value=val;
+      render(val);
+      if(p<1){requestAnimationFrame(step);}
+    }
+    requestAnimationFrame(step);
+  }
+  setTimeout(autoDemo,420);
+})();
+</script>
+</body>
+</html>
